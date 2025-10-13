@@ -67,11 +67,12 @@ const analyzePlatformResponseFlow = ai.defineFlow(
       .split('/')[0];
 
     const patterns = [
-      normalizedTarget,
-      normalizedTarget.replace(/^www\./, ''),
-      `www.${normalizedTarget.replace(/^www\./, '')}`,
-      targetWebsite.toLowerCase(),
-      targetWebsite.replace(/^https?:\/\//, '').toLowerCase(),
+      normalizedTarget, // example.com
+      `www.${normalizedTarget}`, // www.example.com
+      `https://${normalizedTarget}`, // https://example.com
+      `https://www.${normalizedTarget}`, // https://www.example.com
+      `http://${normalizedTarget}`, // http://example.com
+      `http://www.${normalizedTarget}`, // http://www.example.com
     ];
 
     const found = patterns.some(pattern => responseText.toLowerCase().includes(pattern));
