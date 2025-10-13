@@ -36,17 +36,19 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateSeoRecommendationsInputSchema},
   output: {schema: GenerateSeoRecommendationsOutputSchema},
   prompt: `You are an expert SEO consultant specializing in international and geographic targeting (GEO).
-  Your task is to provide actionable recommendations to improve the visibility of the given website across different geographic regions.
+Your task is to provide actionable recommendations to improve the visibility of the given website across different geographic regions. You cannot access external websites, so your advice should be based on general SEO best practices.
 
-  Website: {{{website}}}
+Website: {{{website}}}
 
-  Analyze the website and provide a concise list of 3-5 key recommendations. Focus on practical advice. For example:
-  - "Implement hreflang tags to signal language and regional targeting to search engines."
-  - "Use a Content Delivery Network (CDN) to reduce latency for international users."
-  - "Create localized content and landing pages for your top target countries."
-  - "Optimize your Google Business Profile for local search if you have physical locations."
+Provide a concise list of 3-5 key recommendations for improving the international SEO of the website. Focus on practical, high-impact advice. Frame the recommendations for the provided website.
 
-  Return the recommendations as a single string.`,
+Example format:
+- "Implement hreflang tags on {{{website}}} to signal language and regional targeting to search engines."
+- "Consider using a Content Delivery Network (CDN) to reduce latency for international users visiting {{{website}}}."
+- "Create localized content and landing pages for your top target countries."
+- "Optimize Google Business Profile for local search if {{{website}}} has physical locations."
+
+Return the recommendations as a single string.`,
 });
 
 const generateSeoRecommendationsFlow = ai.defineFlow(
