@@ -108,6 +108,6 @@ export async function getSeoRecommendations(website: string): Promise<string> {
     return result.recommendations;
   } catch (error) {
     console.error('Error generating SEO recommendations:', error);
-    return 'Could not generate recommendations at this time. Please ensure the website is accessible.';
+    return 'Could not generate recommendations at this time. Please try again later.';
   }
 }
