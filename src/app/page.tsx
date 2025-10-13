@@ -11,7 +11,7 @@ import { Alert } from "@/components/ui/alert";
 import { runVisibilityTests, type AllPlatformResults } from './actions';
 import { cn } from '@/lib/utils';
 
-export type PlatformKey = 'chatgpt' | 'copilot' | 'perplexity' | 'grok';
+export type PlatformKey = 'chatgpt' | 'copilot' | 'perplexity';
 
 export interface HistoryEntry {
   website: string;
@@ -23,10 +23,9 @@ export interface HistoryEntry {
 }
 
 const platforms = [
-  { name: 'ChatGPT', key: 'chatgpt', color: '#10a37f', icon: <Bot size={32} className="text-primary-foreground" /> },
+  { name: 'GPT-4o mini', key: 'chatgpt', color: '#10a37f', icon: <Bot size={32} className="text-primary-foreground" /> },
   { name: 'Copilot', key: 'copilot', color: '#0078d4', icon: <Waves size={32} className="text-primary-foreground" /> },
-  { name: 'Perplexity', key: 'perplexity', color: '#0084ff', icon: <BrainCircuit size={32} className="text-primary-foreground" /> },
-  { name: 'Grok', key: 'grok', color: '#00ff88', icon: <Rocket size={32} className="text-primary-foreground" /> }
+  { name: 'Perplexity', key: 'perplexity', color: '#0084ff', icon: <BrainCircuit size={32} className="text-primary-foreground" /> }
 ];
 
 export default function AISightPage() {
@@ -37,6 +36,7 @@ export default function AISightPage() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [statusMessage, setStatusMessage] = useState('');
   const [currentTest, setCurrentTest] = useState('');
+  const [recommendations, setRecommendations] = useState('');
 
   const handleTest = () => {
     if (!website.trim() || !prompt.trim()) {
@@ -47,6 +47,7 @@ export default function AISightPage() {
     setStatusMessage('Starting tests...');
     setCurrentTest('');
     setResults(null);
+    setRecommendations('');
 
     startTransition(async () => {
       try {
@@ -64,6 +65,7 @@ export default function AISightPage() {
         setResults(entry);
         setHistory([entry, ...history.slice(0, 19)]);
         setStatusMessage('✅ All tests complete!');
+        setRecommendations(`For better GEO visibility, ensure your website has hreflang tags for language and regional targeting, use a CDN to improve global load times, and create content relevant to different regions.`);
         setCurrentTest('');
         setTimeout(() => setStatusMessage(''), 4000);
       } catch (error) {
@@ -165,7 +167,7 @@ export default function AISightPage() {
 
         {results && (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {platforms.map((platform) => {
                 const result = results.results[platform.key];
                 const found = result?.found;
@@ -237,6 +239,15 @@ export default function AISightPage() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+
+            {recommendations && (
+              <Card className="bg-card/50 backdrop-blur-sm">
+                <CardHeader><CardTitle>Recommendations</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-slate-300">{recommendations}</p>
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardHeader><CardTitle>Tested Prompt</CardTitle></CardHeader>
