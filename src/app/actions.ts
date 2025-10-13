@@ -1,6 +1,7 @@
 'use server';
 
 import { analyzePlatformResponse } from '@/ai/flows/analyze-platform-responses';
+import { generateSeoRecommendations } from '@/ai/flows/generate-seo-recommendations';
 
 const platforms = [
   { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://api.bk9.dev/ai/BK9?BK9=zobi&model=gpt_o4_mini&q=' },
@@ -99,4 +100,14 @@ export async function runVisibilityTests(website: string, prompt: string): Promi
   }
   
   return platformResults;
+}
+
+export async function getSeoRecommendations(website: string): Promise<string> {
+  try {
+    const result = await generateSeoRecommendations({ website });
+    return result.recommendations;
+  } catch (error) {
+    console.error('Error generating SEO recommendations:', error);
+    return 'Could not generate recommendations at this time. Please ensure the website is accessible.';
+  }
 }

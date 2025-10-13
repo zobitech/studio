@@ -2,13 +2,13 @@
 
 import React, { useState, useTransition, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Rocket, BrainCircuit, Waves } from 'lucide-react';
+import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Rocket, BrainCircuit, Waves, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert } from "@/components/ui/alert";
-import { runVisibilityTests, type AllPlatformResults } from './actions';
+import { runVisibilityTests, getSeoRecommendations, type AllPlatformResults } from './actions';
 import { cn } from '@/lib/utils';
 
 export type PlatformKey = 'chatgpt' | 'copilot' | 'perplexity';
@@ -37,6 +37,7 @@ export default function AISightPage() {
   const [statusMessage, setStatusMessage] = useState('');
   const [currentTest, setCurrentTest] = useState('');
   const [recommendations, setRecommendations] = useState('');
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
 
   const handleTest = () => {
     if (!website.trim() || !prompt.trim()) {
@@ -48,6 +49,7 @@ export default function AISightPage() {
     setCurrentTest('');
     setResults(null);
     setRecommendations('');
+    setIsLoadingRecommendations(false);
 
     startTransition(async () => {
       try {
@@ -64,13 +66,20 @@ export default function AISightPage() {
 
         setResults(entry);
         setHistory([entry, ...history.slice(0, 19)]);
-        setStatusMessage('✅ All tests complete!');
-        setRecommendations(`For better GEO visibility, ensure your website has hreflang tags for language and regional targeting, use a CDN to improve global load times, and create content relevant to different regions.`);
+        setStatusMessage('✅ All tests complete! Generating recommendations...');
         setCurrentTest('');
+        
+        setIsLoadingRecommendations(true);
+        const seoRecs = await getSeoRecommendations(website);
+        setRecommendations(seoRecs);
+        setIsLoadingRecommendations(false);
+
+        setStatusMessage('✅ All tasks complete!');
         setTimeout(() => setStatusMessage(''), 4000);
       } catch (error) {
         console.error('Test error:', error);
         setStatusMessage('❌ Error during testing');
+        setIsLoadingRecommendations(false);
       }
     });
   };
@@ -104,7 +113,7 @@ export default function AISightPage() {
             : 'bg-blue-900/20 border-blue-700 text-blue-200'
           )}>
             <div className="flex items-center gap-3">
-              {isPending && <Loader className="animate-spin" size={20} />}
+              {(isPending || isLoadingRecommendations) && <Loader className="animate-spin" size={20} />}
               <div>
                 <p className="font-semibold">{statusMessage}</p>
                 {currentTest && <p className="text-sm mt-1">{currentTest}</p>}
@@ -131,7 +140,7 @@ export default function AISightPage() {
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !isPending && handleTest()}
-                placeholder="e.g., example.com"
+                placeholder="e.g., https://example.com"
                 className="bg-background/50 focus:border-primary"
                 disabled={isPending}
               />
@@ -225,6 +234,22 @@ export default function AISightPage() {
               </Card>
             </div>
             
+            {(recommendations || isLoadingRecommendations) && (
+              <Card className="bg-card/50 backdrop-blur-sm">
+                <CardHeader><CardTitle className="flex items-center gap-2"><Lightbulb className="text-primary" />Recommendations</CardTitle></CardHeader>
+                <CardContent>
+                  {isLoadingRecommendations ? (
+                    <div className="flex items-center gap-3 text-slate-400">
+                      <Loader className="animate-spin" size={20} />
+                      <p>Analyzing your website and generating recommendations...</p>
+                    </div>
+                  ) : (
+                    <p className="text-slate-300 whitespace-pre-wrap">{recommendations}</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardHeader><CardTitle>Platform Comparison</CardTitle></CardHeader>
               <CardContent>
@@ -239,15 +264,6 @@ export default function AISightPage() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-
-            {recommendations && (
-              <Card className="bg-card/50 backdrop-blur-sm">
-                <CardHeader><CardTitle>Recommendations</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-slate-300">{recommendations}</p>
-                </CardContent>
-              </Card>
-            )}
 
             <Card className="bg-card/50 backdrop-blur-sm">
               <CardHeader><CardTitle>Tested Prompt</CardTitle></CardHeader>
