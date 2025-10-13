@@ -39,10 +39,13 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       }
 
       let responseText = '';
-      if (typeof data.BK9 === 'string') {
-        responseText = data.BK9;
-      } else if (data.BK9?.answer) {
+      if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
         responseText = data.BK9.answer;
+        if (Array.isArray(data.BK9.sources)) {
+          responseText += ' ' + data.BK9.sources.join(' ');
+        }
+      } else if (typeof data.BK9 === 'string') {
+        responseText = data.BK9;
       } else if (typeof data.copilot === 'string') {
         responseText = data.copilot;
       } else if (typeof data.perplexity === 'string') {
@@ -56,7 +59,7 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       } else {
         responseText = JSON.stringify(data);
       }
-
+      
       const analysis = await analyzePlatformResponse({ responseText, targetWebsite: website });
 
       return {
