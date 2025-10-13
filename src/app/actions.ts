@@ -12,7 +12,7 @@ const platforms = [
 async function testAPI(platform: (typeof platforms)[0], prompt: string, website: string) {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     const apiUrl = platform.apiUrl + encodeURIComponent(prompt);
     
@@ -73,7 +73,7 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
     
     return {
       found: false,
-      error: error.name === 'AbortError' ? 'Timeout (20s)' : 'API Connection Failed',
+      error: error.name === 'AbortError' ? 'Timeout (30s)' : 'API Connection Failed',
       status: 'failed' as const,
       timestamp: new Date().toLocaleTimeString()
     };

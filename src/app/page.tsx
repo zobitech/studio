@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Rocket, BrainCircuit, Waves, Lightbulb } from 'lucide-react';
+import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Waves, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Alert } from "@/components/ui/alert";
 import { runVisibilityTests, getSeoRecommendations, type AllPlatformResults } from './actions';
 import { cn } from '@/lib/utils';
+import { BrainCircuit } from 'lucide-react';
 
 export type PlatformKey = 'chatgpt' | 'copilot' | 'perplexity';
 
@@ -45,6 +46,12 @@ export default function AISightPage() {
       return;
     }
     
+    let normalizedWebsite = website.trim();
+    if (!normalizedWebsite.startsWith('http://') && !normalizedWebsite.startsWith('https://')) {
+      normalizedWebsite = 'https://' + normalizedWebsite;
+    }
+    setWebsite(normalizedWebsite);
+    
     setStatusMessage('Starting tests...');
     setCurrentTest('');
     setResults(null);
@@ -53,10 +60,10 @@ export default function AISightPage() {
 
     startTransition(async () => {
       try {
-        const platformResults = await runVisibilityTests(website, prompt);
+        const platformResults = await runVisibilityTests(normalizedWebsite, prompt);
         
         const entry: HistoryEntry = {
-          website,
+          website: normalizedWebsite,
           prompt,
           date: new Date().toLocaleDateString(),
           time: new Date().toLocaleTimeString(),
@@ -70,7 +77,7 @@ export default function AISightPage() {
         setCurrentTest('');
         
         setIsLoadingRecommendations(true);
-        const seoRecs = await getSeoRecommendations(website);
+        const seoRecs = await getSeoRecommendations(normalizedWebsite);
         setRecommendations(seoRecs);
         setIsLoadingRecommendations(false);
 
@@ -140,7 +147,7 @@ export default function AISightPage() {
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !isPending && handleTest()}
-                placeholder="e.g., https://example.com"
+                placeholder="e.g., example.com"
                 className="bg-background/50 focus:border-primary"
                 disabled={isPending}
               />
