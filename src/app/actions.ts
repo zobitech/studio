@@ -117,6 +117,15 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
   }
 }
 
+export async function runSingleTest(platformKey: string, prompt: string, website: string) {
+  const platform = platforms.find(p => p.key === platformKey);
+  if (!platform) {
+    throw new Error(`Platform ${platformKey} not found.`);
+  }
+  return await testAPI(platform, prompt, website);
+}
+
+
 export type PlatformResult = Awaited<ReturnType<typeof testAPI>>;
 export type AllPlatformResults = Record<string, PlatformResult>;
 

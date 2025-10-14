@@ -2,13 +2,13 @@
 
 import React, { useState, useTransition, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Waves, Lightbulb } from 'lucide-react';
+import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Waves, Lightbulb, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert } from "@/components/ui/alert";
-import { runVisibilityTests, getSeoRecommendations, type AllPlatformResults } from './actions';
+import { runVisibilityTests, getSeoRecommendations, runSingleTest, type AllPlatformResults, type PlatformResult } from './actions';
 import { cn } from '@/lib/utils';
 import { BrainCircuit } from 'lucide-react';
 
@@ -24,9 +24,9 @@ export interface HistoryEntry {
 }
 
 const platforms = [
-  { name: 'GPT-4o mini', key: 'chatgpt', color: '#10a37f', icon: <Bot size={32} className="text-primary-foreground" /> },
-  { name: 'Copilot', key: 'copilot', color: '#0078d4', icon: <Waves size={32} className="text-primary-foreground" /> },
-  { name: 'Perplexity', key: 'perplexity', color: '#0084ff', icon: <BrainCircuit size={32} className="text-primary-foreground" /> }
+  { name: 'GPT-4o mini', key: 'chatgpt' as PlatformKey, color: '#10a37f', icon: <Bot size={32} className="text-primary-foreground" /> },
+  { name: 'Copilot', key: 'copilot' as PlatformKey, color: '#0078d4', icon: <Waves size={32} className="text-primary-foreground" /> },
+  { name: 'Perplexity', key: 'perplexity' as PlatformKey, color: '#0084ff', icon: <BrainCircuit size={32} className="text-primary-foreground" /> }
 ];
 
 export default function AISightPage() {
@@ -39,6 +39,8 @@ export default function AISightPage() {
   const [currentTest, setCurrentTest] = useState('');
   const [recommendations, setRecommendations] = useState('');
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
+  const [retestingPlatform, setRetestingPlatform] = useState<string | null>(null);
+
 
   const handleTest = () => {
     if (!website.trim() || !prompt.trim()) {
@@ -90,6 +92,52 @@ export default function AISightPage() {
       }
     });
   };
+
+  const handleRefresh = (platformKey: PlatformKey) => {
+    if (!results) return;
+
+    setRetestingPlatform(platformKey);
+    startTransition(async () => {
+      try {
+        const newResult = await runSingleTest(platformKey, results.prompt, results.website);
+        
+        setResults(prevResults => {
+          if (!prevResults) return null;
+          
+          const newPlatformResults = {
+            ...prevResults.results,
+            [platformKey]: newResult
+          };
+          
+          const newFoundCount = Object.values(newPlatformResults).filter(r => r.found).length;
+
+          const updatedEntry: HistoryEntry = {
+            ...prevResults,
+            results: newPlatformResults,
+            foundCount: newFoundCount,
+          };
+          
+          // Also update history
+          setHistory(prevHistory => {
+            const newHistory = [...prevHistory];
+            const historyIndex = newHistory.findIndex(h => h.time === prevResults.time && h.date === prevResults.date);
+            if (historyIndex !== -1) {
+              newHistory[historyIndex] = updatedEntry;
+            }
+            return newHistory;
+          });
+
+          return updatedEntry;
+        });
+
+      } catch (error) {
+        console.error(`Error re-testing ${platformKey}:`, error);
+      } finally {
+        setRetestingPlatform(null);
+      }
+    });
+  };
+
 
   const chartData = useMemo(() => platforms.map(p => ({
     name: p.name,
@@ -188,6 +236,8 @@ export default function AISightPage() {
                 const result = results.results[platform.key];
                 const found = result?.found;
                 const error = result?.error;
+                const isRetesting = retestingPlatform === platform.key;
+
                 return (
                   <Card key={platform.key} className={cn("transition-all backdrop-blur-sm",
                     error ? 'bg-slate-700/20 border-slate-600'
@@ -195,9 +245,22 @@ export default function AISightPage() {
                     : 'bg-red-900/20 border-red-700'
                   )}>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-3">
-                        {platform.icon}
-                        {platform.name}
+                      <CardTitle className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {platform.icon}
+                          {platform.name}
+                        </div>
+                        {error && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRefresh(platform.key)}
+                            disabled={isRetesting}
+                            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10"
+                          >
+                            {isRetesting ? <Loader className="animate-spin" /> : <RefreshCw size={18} />}
+                          </Button>
+                        )}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -251,7 +314,7 @@ export default function AISightPage() {
                       <p>Analyzing your website and generating recommendations...</p>
                     </div>
                   ) : (
-                    <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: recommendations.replace(/### (.*?)\n/g, '<h3 class="text-xl font-semibold text-white mb-3 mt-4">$1</h3>').replace(/\* \*\*(.*?):\*\*/g, '<h4 class="font-semibold text-slate-100 mt-3 mb-1">$1</h4>').replace(/\* /g, '<li class="ml-4">').replace(/(\r\n|\n|\r)/gm, "<br>")  }} />
+                    <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: recommendations.replace(/###\s(.*?)\n/g, '<h3 class="text-xl font-semibold text-white mb-3 mt-4">$1</h3>').replace(/\*\*\*(.*?):\*\*\*/g, '<h4 class="font-semibold text-slate-100 mt-3 mb-1">$1</h4>').replace(/\* (.*?)\n/g, '<li>$1</li>').replace(/(\r\n|\n|\r)/gm, "")  }} />
                   )}
                 </CardContent>
               </Card>
