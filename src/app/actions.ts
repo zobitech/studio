@@ -124,8 +124,8 @@ export async function getSeoRecommendations(website: string): Promise<string> {
   try {
     const result = await generateSeoRecommendations({ website });
     return result.recommendations;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating SEO recommendations:', error);
-    return 'Could not generate recommendations at this time. Please try again later.';
+    return `Could not generate recommendations at this time. The AI model may be temporarily unavailable. Please try again later. (Error: ${error.message || 'Unknown'})`;
   }
 }
