@@ -14,7 +14,12 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    const apiUrl = platform.apiUrl + encodeURIComponent(prompt);
+    let finalPrompt = prompt;
+    if (platform.key === 'chatgpt' || platform.key === 'copilot') {
+      finalPrompt += ' Please include web links and sources in your response.';
+    }
+    
+    const apiUrl = platform.apiUrl + encodeURIComponent(finalPrompt);
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -47,10 +52,12 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       } else if (typeof data.BK9 === 'string') {
         responseText = data.BK9;
       } else if (data.copilot) {
-        if (typeof data.copilot === 'string') {
+         if (typeof data.copilot === 'string') {
           responseText = data.copilot;
         } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
           responseText = data.copilot.answer;
+        } else {
+           responseText = JSON.stringify(data.copilot);
         }
       } else if (data.perplexity) {
          if (typeof data.perplexity === 'string') {
