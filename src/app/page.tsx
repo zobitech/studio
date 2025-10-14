@@ -233,57 +233,61 @@ export default function AISightPage() {
           </CardFooter>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center">
-            <div className="flex flex-col items-center p-4">
-                <Eye size={36} className="text-accent mb-3" />
-                <h3 className="text-xl font-bold text-white mb-2">Uncover Blind Spots</h3>
-                <p className="text-slate-400">Identify where your website fails to appear in AI-generated answers and recommendations.</p>
-            </div>
-            <div className="flex flex-col items-center p-4">
-                <BarChart2 size={36} className="text-accent mb-3" />
-                <h3 className="text-xl font-bold text-white mb-2">Benchmark Competitors</h3>
-                <p className="text-slate-400">See how your competitors are performing and find opportunities to outrank them in AI results.</p>
-            </div>
-            <div className="flex flex-col items-center p-4">
-                <Zap size={36} className="text-accent mb-3" />
-                <h3 className="text-xl font-bold text-white mb-2">Get Actionable Insights</h3>
-                <p className="text-slate-400">Receive expert, AI-powered recommendations to boost your visibility and capture more traffic.</p>
-            </div>
-        </div>
+        {!results && (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center">
+                    <div className="flex flex-col items-center p-4">
+                        <Eye size={36} className="text-accent mb-3" />
+                        <h3 className="text-xl font-bold text-white mb-2">Uncover Blind Spots</h3>
+                        <p className="text-slate-400">Identify where your website fails to appear in AI-generated answers and recommendations.</p>
+                    </div>
+                    <div className="flex flex-col items-center p-4">
+                        <BarChart2 size={36} className="text-accent mb-3" />
+                        <h3 className="text-xl font-bold text-white mb-2">Benchmark Competitors</h3>
+                        <p className="text-slate-400">See how your competitors are performing and find opportunities to outrank them in AI results.</p>
+                    </div>
+                    <div className="flex flex-col items-center p-4">
+                        <Zap size={36} className="text-accent mb-3" />
+                        <h3 className="text-xl font-bold text-white mb-2">Get Actionable Insights</h3>
+                        <p className="text-slate-400">Receive expert, AI-powered recommendations to boost your visibility and capture more traffic.</p>
+                    </div>
+                </div>
 
-        <div className="mb-12">
-            <h2 className="text-3xl font-bold text-center text-white mb-8">Trusted Across the Globe</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <Card className="bg-card/40 backdrop-blur-sm">
-                    <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                            <Avatar>
-                                <AvatarImage src="https://picsum.photos/seed/user1/100/100" />
-                                <AvatarFallback>JD</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="text-slate-300 italic">"AISight showed we were invisible in 70% of AI answers. We fixed it and organic traffic jumped 22% in a month!"</p>
-                                <p className="font-bold text-white mt-3">- Jane Doe, Marketing Lead</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="bg-card/40 backdrop-blur-sm">
-                    <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                             <Avatar>
-                                <AvatarImage src="https://picsum.photos/seed/user2/100/100" />
-                                <AvatarFallback>MS</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="text-slate-300 italic">"An essential tool for modern SEO. We uncovered content gaps we never would have found otherwise. Highly recommended."</p>
-                                <p className="font-bold text-white mt-3">- Mark Smith, Founder</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
+                <div className="mb-12">
+                    <h2 className="text-3xl font-bold text-center text-white mb-8">Trusted Across the Globe</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        <Card className="bg-card/40 backdrop-blur-sm">
+                            <CardContent className="p-6">
+                                <div className="flex items-start gap-4">
+                                    <Avatar>
+                                        <AvatarImage src="https://picsum.photos/seed/user1/100/100" />
+                                        <AvatarFallback>JD</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="text-slate-300 italic">"AISight showed we were invisible in 70% of AI answers. We fixed it and organic traffic jumped 22% in a month!"</p>
+                                        <p className="font-bold text-white mt-3">- Jane Doe, Marketing Lead</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card className="bg-card/40 backdrop-blur-sm">
+                            <CardContent className="p-6">
+                                <div className="flex items-start gap-4">
+                                    <Avatar>
+                                        <AvatarImage src="https://picsum.photos/seed/user2/100/100" />
+                                        <AvatarFallback>MS</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="text-slate-300 italic">"An essential tool for modern SEO. We uncovered content gaps we never would have found otherwise. Highly recommended."</p>
+                                        <p className="font-bold text-white mt-3">- Mark Smith, Founder</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </>
+        )}
 
         {results && (
           <div className="space-y-8">
@@ -398,6 +402,59 @@ export default function AISightPage() {
                 <p className="text-slate-300 bg-background/50 p-4 rounded-lg italic">"{results.prompt}"</p>
               </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 my-12 text-center">
+                <div className="flex flex-col items-center p-4">
+                    <Eye size={36} className="text-accent mb-3" />
+                    <h3 className="text-xl font-bold text-white mb-2">Uncover Blind Spots</h3>
+                    <p className="text-slate-400">Identify where your website fails to appear in AI-generated answers and recommendations.</p>
+                </div>
+                <div className="flex flex-col items-center p-4">
+                    <BarChart2 size={36} className="text-accent mb-3" />
+                    <h3 className="text-xl font-bold text-white mb-2">Benchmark Competitors</h3>
+                    <p className="text-slate-400">See how your competitors are performing and find opportunities to outrank them in AI results.</p>
+                </div>
+                <div className="flex flex-col items-center p-4">
+                    <Zap size={36} className="text-accent mb-3" />
+                    <h3 className="text-xl font-bold text-white mb-2">Get Actionable Insights</h3>
+                    <p className="text-slate-400">Receive expert, AI-powered recommendations to boost your visibility and capture more traffic.</p>
+                </div>
+            </div>
+
+            <div className="my-12">
+                <h2 className="text-3xl font-bold text-center text-white mb-8">Trusted Across the Globe</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <Card className="bg-card/40 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                            <div className="flex items-start gap-4">
+                                <Avatar>
+                                    <AvatarImage src="https://picsum.photos/seed/user1/100/100" />
+                                    <AvatarFallback>JD</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="text-slate-300 italic">"AISight showed we were invisible in 70% of AI answers. We fixed it and organic traffic jumped 22% in a month!"</p>
+                                    <p className="font-bold text-white mt-3">- Jane Doe, Marketing Lead</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-card/40 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                            <div className="flex items-start gap-4">
+                                <Avatar>
+                                    <AvatarImage src="https://picsum.photos/seed/user2/100/100" />
+                                    <AvatarFallback>MS</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="text-slate-300 italic">"An essential tool for modern SEO. We uncovered content gaps we never would have found otherwise. Highly recommended."</p>
+                                    <p className="font-bold text-white mt-3">- Mark Smith, Founder</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+
           </div>
         )}
 
