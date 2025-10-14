@@ -2,7 +2,7 @@
 
 import React, { useState, useTransition, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Waves, Lightbulb, RefreshCw } from 'lucide-react';
+import { Search, Loader, CheckCircle, AlertCircle, Globe, TrendingUp, Bot, Waves, Lightbulb, RefreshCw, Eye, ShieldCheck, Zap, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +11,9 @@ import { Alert } from "@/components/ui/alert";
 import { runVisibilityTests, getSeoRecommendations, runSingleTest, type AllPlatformResults, type PlatformResult } from './actions';
 import { cn } from '@/lib/utils';
 import { BrainCircuit } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 export type PlatformKey = 'chatgpt' | 'copilot' | 'perplexity';
 
@@ -151,18 +154,19 @@ export default function AISightPage() {
   })), [history]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 sm:p-6 text-slate-100">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
+        <header className="mb-8 text-center">
+          <div className="flex items-center justify-center gap-3 mb-2">
             <Globe className="text-accent" size={40} />
             <h1 className="text-4xl md:text-5xl font-bold text-white font-headline">AISight</h1>
           </div>
-          <p className="text-slate-400 text-lg">Monitor your website visibility across AI platforms</p>
+          <p className="text-slate-300 text-xl md:text-2xl font-light mt-2">Is your website invisible to AI?</p>
+          <p className="text-primary text-lg md:text-xl font-semibold mt-1">See where you appear in ChatGPT, Copilot & Perplexity in under 60 seconds.</p>
         </header>
 
         {(isPending || statusMessage) && (
-          <Alert className={cn("mb-6",
+          <Alert className={cn("mb-6 max-w-2xl mx-auto",
             statusMessage.includes('✅') ? 'bg-emerald-900/20 border-emerald-700 text-emerald-200'
             : statusMessage.includes('❌') ? 'bg-red-900/20 border-red-700 text-red-200'
             : 'bg-blue-900/20 border-blue-700 text-blue-200'
@@ -177,46 +181,45 @@ export default function AISightPage() {
           </Alert>
         )}
 
-        <Card className="bg-card/50 backdrop-blur-sm mb-8">
+        <Card className="bg-card/50 backdrop-blur-sm mb-12 max-w-2xl mx-auto shadow-2xl shadow-primary/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-2xl">
               <Search size={24} className="text-primary" />
-              New Visibility Test
+              Start Your Free Visibility Test
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
               <label className="block text-white font-semibold mb-3 flex items-center gap-2">
                 <Globe size={20} className="text-accent" />
-                Enter Your Website
+                Your Website URL
               </label>
               <Input
                 type="text"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !isPending && handleTest()}
-                placeholder="e.g., example.com"
-                className="bg-background/50 focus:border-primary"
+                placeholder="e.g., mybusiness.com"
+                className="bg-background/50 focus:border-primary text-lg"
                 disabled={isPending}
               />
             </div>
             <div>
               <label className="block text-white font-semibold mb-3 flex items-center gap-2">
                 <Search size={20} className="text-accent" />
-                Enter Your Prompt
+                A Prompt to Test
               </label>
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyPress={(e) => e.ctrlKey && e.key === 'Enter' && !isPending && handleTest()}
-                placeholder="e.g., What are the best productivity tools?"
-                className="bg-background/50 resize-none h-28 focus:border-primary"
+                placeholder="e.g., What are the best marketing agencies in New York?"
+                className="bg-background/50 resize-none h-28 focus:border-primary text-lg"
                 disabled={isPending}
               />
-              <p className="text-slate-400 text-sm mt-2">Ctrl+Enter to start the test.</p>
             </div>
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex-col gap-3">
             <Button
               onClick={handleTest}
               disabled={isPending}
@@ -224,10 +227,63 @@ export default function AISightPage() {
               size="lg"
             >
               {isPending ? <Loader className="animate-spin mr-2" /> : <Search className="mr-2" />}
-              {isPending ? 'Testing...' : 'Test Website Visibility'}
+              {isPending ? 'Testing...' : 'Test My Website Visibility'}
             </Button>
+            <p className="text-slate-400 text-sm">Free, instant results – no signup required.</p>
           </CardFooter>
         </Card>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center">
+            <div className="flex flex-col items-center p-4">
+                <Eye size={36} className="text-accent mb-3" />
+                <h3 className="text-xl font-bold text-white mb-2">Uncover Blind Spots</h3>
+                <p className="text-slate-400">Identify where your website fails to appear in AI-generated answers and recommendations.</p>
+            </div>
+            <div className="flex flex-col items-center p-4">
+                <BarChart2 size={36} className="text-accent mb-3" />
+                <h3 className="text-xl font-bold text-white mb-2">Benchmark Competitors</h3>
+                <p className="text-slate-400">See how your competitors are performing and find opportunities to outrank them in AI results.</p>
+            </div>
+            <div className="flex flex-col items-center p-4">
+                <Zap size={36} className="text-accent mb-3" />
+                <h3 className="text-xl font-bold text-white mb-2">Get Actionable Insights</h3>
+                <p className="text-slate-400">Receive expert, AI-powered recommendations to boost your visibility and capture more traffic.</p>
+            </div>
+        </div>
+
+        <div className="mb-12">
+            <h2 className="text-3xl font-bold text-center text-white mb-8">Trusted Across the Globe</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <Card className="bg-card/40 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                            <Avatar>
+                                <AvatarImage src="https://picsum.photos/seed/user1/100/100" />
+                                <AvatarFallback>JD</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="text-slate-300 italic">"AISight showed we were invisible in 70% of AI answers. We fixed it and organic traffic jumped 22% in a month!"</p>
+                                <p className="font-bold text-white mt-3">- Jane Doe, Marketing Lead</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="bg-card/40 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                             <Avatar>
+                                <AvatarImage src="https://picsum.photos/seed/user2/100/100" />
+                                <AvatarFallback>MS</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="text-slate-300 italic">"An essential tool for modern SEO. We uncovered content gaps we never would have found otherwise. Highly recommended."</p>
+                                <p className="font-bold text-white mt-3">- Mark Smith, Founder</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
 
         {results && (
           <div className="space-y-8">
@@ -250,13 +306,14 @@ export default function AISightPage() {
                           {platform.icon}
                           {platform.name}
                         </div>
-                        {error && (
+                        {(error || !found) && (
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => handleRefresh(platform.key)}
                             disabled={isRetesting}
                             className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10"
+                            title={`Re-run test for ${platform.name}`}
                           >
                             {isRetesting ? <Loader className="animate-spin" /> : <RefreshCw size={18} />}
                           </Button>
@@ -314,7 +371,7 @@ export default function AISightPage() {
                       <p>Analyzing your website and generating recommendations...</p>
                     </div>
                   ) : (
-                    <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: recommendations.replace(/###\s(.*?)\n/g, '<h3 class="text-xl font-semibold text-white mb-3 mt-4">$1</h3>').replace(/\*\*\*(.*?):\*\*\*/g, '<h4 class="font-semibold text-slate-100 mt-3 mb-1">$1</h4>').replace(/\* (.*?)\n/g, '<li>$1</li>').replace(/(\r\n|\n|\r)/gm, "")  }} />
+                    <div className="prose prose-invert max-w-none text-slate-300 prose-headings:text-white prose-h3:text-primary prose-h4:text-slate-100 prose-strong:text-white" dangerouslySetInnerHTML={{ __html: recommendations }} />
                   )}
                 </CardContent>
               </Card>
@@ -343,6 +400,35 @@ export default function AISightPage() {
             </Card>
           </div>
         )}
+
+        <div className="max-w-3xl mx-auto mt-12">
+            <div className="flex items-center justify-center gap-4 mb-8">
+                <ShieldCheck className="text-green-400" size={24} />
+                <p className="text-green-300"><span className="font-bold">Your Privacy is Protected.</span> We perform a safe, read-only scan. Your data is never stored.</p>
+            </div>
+
+            <Accordion type="single" collapsible className="w-full bg-card/40 rounded-lg p-2">
+                <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-lg font-semibold text-white px-4">How does this work?</AccordionTrigger>
+                    <AccordionContent className="text-slate-300 px-4">
+                        AISight sends your prompt to several major AI platforms (like GPT-4o mini and Copilot) and analyzes their live responses to see if your website is mentioned or used as a source. It's a real-time check of your visibility inside these "answer engines."
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-lg font-semibold text-white px-4">Is it really free?</AccordionTrigger>
+                    <AccordionContent className="text-slate-300 px-4">
+                        Yes. This tool is 100% free to use. We use proxied APIs that do not require you to enter your own API keys.
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                    <AccordionTrigger className="text-lg font-semibold text-white px-4">How can I improve my score?</AccordionTrigger>
+                    <AccordionContent className="text-slate-300 px-4">
+                       After each test, we provide a detailed, AI-generated list of recommendations. These tips focus on technical SEO, content strategy, and E-E-A-T (Expertise, Authoritativeness, Trustworthiness) signals that AI models look for.
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
+
 
         {history.length > 0 && (
           <Card className="mt-8 bg-card/50 backdrop-blur-sm">
@@ -381,9 +467,8 @@ export default function AISightPage() {
           </Card>
         )}
         
-        <footer className="mt-8 text-center text-slate-500 text-xs">
+        <footer className="mt-8 text-center text-slate-500 text-xs py-8">
             <p>Powered by AISight. All rights reserved.</p>
-            <p className="mt-2">Note: API keys are handled server-side for security. Some proxied APIs may experience intermittent connectivity.</p>
         </footer>
       </div>
     </div>
