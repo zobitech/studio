@@ -46,10 +46,18 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
         }
       } else if (typeof data.BK9 === 'string') {
         responseText = data.BK9;
-      } else if (typeof data.copilot === 'string') {
-        responseText = data.copilot;
-      } else if (typeof data.perplexity === 'string') {
-        responseText = data.perplexity;
+      } else if (data.copilot) {
+        if (typeof data.copilot === 'string') {
+          responseText = data.copilot;
+        } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
+          responseText = data.copilot.answer;
+        }
+      } else if (data.perplexity) {
+         if (typeof data.perplexity === 'string') {
+          responseText = data.perplexity;
+        } else if (typeof data.perplexity === 'object' && data.perplexity !== null && 'answer' in data.perplexity) {
+          responseText = data.perplexity.answer;
+        }
       } else if (data.answer) {
         responseText = data.answer;
       } else if (data.message) {
