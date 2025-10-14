@@ -3,7 +3,7 @@
 import { analyzePlatformResponse } from '@/ai/flows/analyze-platform-responses';
 
 const platforms = [
-  { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://api.bk9.dev/ai/BK9?BK9=zobi&model=gpt_o4_mini&q=' },
+  { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://princeapi.zone.id/api/ai/openai?apikey=prince&q=' },
   { name: 'Copilot', key: 'copilot', isPost: false, apiUrl: 'https://api.bk9.dev/ai/copilot?q=' },
   { name: 'Perplexity', key: 'perplexity', isPost: false, apiUrl: 'https://api.bk9.dev/ai/Perplexity?q=' },
 ];
@@ -44,7 +44,9 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
 
       let responseText = '';
       if (platform.key === 'chatgpt') {
-        if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
+        if (data.result) {
+          responseText = data.result;
+        } else if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
           responseText = data.BK9.answer;
           if (Array.isArray(data.BK9.sources)) {
             responseText += ' ' + data.BK9.sources.join(' ');
@@ -209,7 +211,9 @@ Provide a detailed set of recommendations structured with the following headings
     const data = await response.json();
     let recommendations = '';
 
-    if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
+    if (data.result) {
+      recommendations = data.result;
+    } else if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
       recommendations = data.BK9.answer;
     } else if (typeof data.BK9 === 'string') {
       recommendations = data.BK9;
