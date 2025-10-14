@@ -1,7 +1,6 @@
 'use server';
 
 import { analyzePlatformResponse } from '@/ai/flows/analyze-platform-responses';
-import { generateSeoRecommendations } from '@/ai/flows/generate-seo-recommendations';
 
 const platforms = [
   { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://api.bk9.dev/ai/BK9?BK9=zobi&model=gpt_o4_mini&q=' },
@@ -44,33 +43,49 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       }
 
       let responseText = '';
-      if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
-        responseText = data.BK9.answer;
-        if (Array.isArray(data.BK9.sources)) {
-          responseText += ' ' + data.BK9.sources.join(' ');
+       if (platform.key === 'chatgpt') {
+        if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
+          responseText = data.BK9.answer;
+          if (Array.isArray(data.BK9.sources)) {
+            responseText += ' ' + data.BK9.sources.join(' ');
+          }
+        } else if (typeof data.BK9 === 'string') {
+          responseText = data.BK9;
+        } else if (data.answer) {
+          responseText = data.answer;
         }
-      } else if (typeof data.BK9 === 'string') {
-        responseText = data.BK9;
-      } else if (data.copilot) {
+      } else if (platform.key === 'copilot') {
          if (typeof data.copilot === 'string') {
           responseText = data.copilot;
         } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
           responseText = data.copilot.answer;
+        } else if (data.answer) {
+           responseText = data.answer;
         } else {
-           responseText = JSON.stringify(data.copilot);
+           responseText = JSON.stringify(data);
         }
-      } else if (data.perplexity) {
-         if (typeof data.perplexity === 'string') {
+      } else if (platform.key === 'perplexity') {
+        if (data.BK9 && typeof data.BK9 === 'object' && data.BK9.answer) {
+          responseText = data.BK9.answer;
+          if (Array.isArray(data.BK9.sources)) {
+            responseText += ' ' + data.BK9.sources.join(' ');
+          }
+        } else if (typeof data.perplexity === 'string') {
           responseText = data.perplexity;
         } else if (typeof data.perplexity === 'object' && data.perplexity !== null && 'answer' in data.perplexity) {
           responseText = data.perplexity.answer;
+        } else if (data.answer) {
+          responseText = data.answer;
         }
-      } else if (data.answer) {
+      }
+      else if (data.answer) {
         responseText = data.answer;
       } else if (data.message) {
         responseText = data.message;
       } else if (data.choices && data.choices[0]?.message?.content) {
         responseText = data.choices[0].message.content;
+      } else if (typeof data === 'string') {
+        responseText = data;
       } else {
         responseText = JSON.stringify(data);
       }
@@ -121,9 +136,64 @@ export async function runVisibilityTests(website: string, prompt: string): Promi
 }
 
 export async function getSeoRecommendations(website: string): Promise<string> {
+  const recommendationPrompt = `You are an expert AI Visibility and SEO Consultant. Your primary goal is to provide detailed, actionable strategies for a website to improve its chances of being cited and recommended by large language models (LLMs) like GPT, Copilot, and Perplexity, with a special focus on geographic (GEO) and international targeting.
+
+Your advice should be comprehensive and well-explained, assuming the user's website has low visibility (e.g., 0/3 or 1/3 score). Your recommendations must be based on established SEO and content strategy best practices.
+
+The user's website is: ${website}
+
+Provide a detailed set of recommendations structured with the following headings. For each recommendation, explain *why* it is important for AI visibility and provide a clear, actionable *how-to* guide.
+
+**### 1. Master Your Geographic & Local Signals**
+   - **Why it's important:** Explain how clear geographic information helps AIs confidently recommend the site for location-specific queries.
+   - **How to implement:**
+     - **On-Page SEO:** Detail how to use location keywords in titles, headings, and body content (e.g., "Best Pizza in Brooklyn" for a pizzeria).
+     - **Structured Data:** Explain the importance of 'LocalBusiness' schema markup with a complete address, phone number, and operating hours. Provide a simple JSON-LD example.
+     - **Content Strategy:** Recommend creating location-specific landing pages or blog posts (e.g., "Our Guide to Visiting San Francisco" if the website is a hotel there).
+
+**### 2. Become an Authoritative Source for AIs**
+   - **Why it's important:** Explain that AIs are trained to recognize and prioritize authoritative, trustworthy content. High-quality content is more likely to be used as a source.
+   - **How to implement:**
+     - **E-E-A-T Principles:** Briefly explain Expertise, Authoritativeness, and Trustworthiness. Advise on creating an "About Us" page, author bios with credentials, and citing sources.
+     - **In-Depth Content:** Recommend writing comprehensive guides, tutorials, or original research that fully answers a user's question, making the website the definitive source.
+     - **Clear & Simple Language:** Explain that AIs often simplify complex topics. Advise using clear headings (H2, H3), short paragraphs, and bullet points for easy parsing.
+
+**### 3. Optimize for International Audiences (if applicable)**
+   - **Why it's important:** If the website targets multiple countries, explain how to signal this to search engines and AIs to avoid confusion and appear in relevant international searches.
+   - **How to implement:**
+     - **hreflang Tags:** Explain what hreflang tags are and provide an example for a website targeting the US and Germany.
+     - **URL Structure:** Briefly discuss the pros and cons of using subdomains (de.example.com) vs. subdirectories (example.com/de/) for international content.
+     - **Content Localization:** Stress that translating content is not enough. It must be culturally adapted (e.g., currency, local idioms, imagery).
+
+Return the recommendations as a single, well-formatted string.`;
+
   try {
-    const result = await generateSeoRecommendations({ website });
-    return result.recommendations;
+    const gptPlatform = platforms.find(p => p.key === 'chatgpt');
+    if (!gptPlatform) {
+      throw new Error("GPT-4o mini platform not found.");
+    }
+    
+    const apiUrl = gptPlatform.apiUrl + encodeURIComponent(recommendationPrompt);
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    let recommendations = '';
+
+    if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
+      recommendations = data.BK9.answer;
+    } else if (typeof data.BK9 === 'string') {
+      recommendations = data.BK9;
+    } else if (data.answer) {
+      recommendations = data.answer;
+    } else {
+      recommendations = "Could not parse recommendations from the API response.";
+    }
+
+    return recommendations;
   } catch (error: any) {
     console.error('Error generating SEO recommendations:', error);
     return `Could not generate recommendations at this time. The AI model may be temporarily unavailable. Please try again later. (Error: ${error.message || 'Unknown'})`;
