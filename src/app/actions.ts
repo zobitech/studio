@@ -11,7 +11,7 @@ const platforms = [
 async function testAPI(platform: (typeof platforms)[0], prompt: string, website: string) {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // Increased timeout to 60s
 
     let finalPrompt = prompt;
     if (platform.key === 'chatgpt' || platform.key === 'copilot') {
@@ -43,7 +43,7 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       }
 
       let responseText = '';
-       if (platform.key === 'chatgpt') {
+      if (platform.key === 'chatgpt') {
         if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
           responseText = data.BK9.answer;
           if (Array.isArray(data.BK9.sources)) {
@@ -61,6 +61,10 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
           responseText = data.copilot.answer;
         } else if (data.answer) {
            responseText = data.answer;
+        } else if (data.message) {
+           responseText = data.message;
+        } else if (typeof data === 'string') {
+           responseText = data;
         } else {
            responseText = JSON.stringify(data);
         }
@@ -106,7 +110,7 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
     
     return {
       found: false,
-      error: error.name === 'AbortError' ? 'Timeout (30s)' : 'API Connection Failed',
+      error: error.name === 'AbortError' ? 'Timeout (60s)' : 'API Connection Failed',
       status: 'failed' as const,
       timestamp: new Date().toLocaleTimeString()
     };

@@ -251,7 +251,7 @@ export default function AISightPage() {
                       <p>Analyzing your website and generating recommendations...</p>
                     </div>
                   ) : (
-                    <p className="text-slate-300 whitespace-pre-wrap">{recommendations}</p>
+                    <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: recommendations.replace(/### (.*?)\n/g, '<h3 class="text-xl font-semibold text-white mb-3 mt-4">$1</h3>').replace(/\* \*\*(.*?):\*\*/g, '<h4 class="font-semibold text-slate-100 mt-3 mb-1">$1</h4>').replace(/\* /g, '<li class="ml-4">').replace(/(\r\n|\n|\r)/gm, "<br>")  }} />
                   )}
                 </CardContent>
               </Card>
