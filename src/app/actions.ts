@@ -149,36 +149,49 @@ export async function runVisibilityTests(website: string, prompt: string): Promi
 }
 
 export async function getSeoRecommendations(website: string): Promise<string> {
+  if (!website) {
+    return "Could not generate recommendations because the website URL is missing.";
+  }
+  
   const recommendationPrompt = `You are an expert AI Visibility and SEO Consultant. Your primary goal is to provide detailed, actionable strategies for a website to improve its chances of being cited and recommended by large language models (LLMs) like GPT, Copilot, and Perplexity, with a special focus on geographic (GEO) and international targeting.
 
 Your advice should be comprehensive and well-explained, assuming the user's website has low visibility (e.g., 0/3 or 1/3 score). Your recommendations must be based on established SEO and content strategy best practices.
 
 The user's website is: ${website}
 
+IMPORTANT: You MUST return your response as a single string of properly formatted HTML. Use tags like <h3>, <h4>, <p>, <ul>, <li>, <strong>, etc. Do not include <html>, <head>, or <body> tags.
+
 Provide a detailed set of recommendations structured with the following headings. For each recommendation, explain *why* it is important for AI visibility and provide a clear, actionable *how-to* guide.
 
-**### 1. Master Your Geographic & Local Signals**
-   - **Why it's important:** Explain how clear geographic information helps AIs confidently recommend the site for location-specific queries.
-   - **How to implement:**
-     - **On-Page SEO:** Detail how to use location keywords in titles, headings, and body content (e.g., "Best Pizza in Brooklyn" for a pizzeria).
-     - **Structured Data:** Explain the importance of 'LocalBusiness' schema markup with a complete address, phone number, and operating hours. Provide a simple JSON-LD example.
-     - **Content Strategy:** Recommend creating location-specific landing pages or blog posts (e.g., "Our Guide to Visiting San Francisco" if the website is a hotel there).
+<h3>1. Master Your Geographic & Local Signals</h3>
+   <h4>Why it's important:</h4>
+   <p>Explain how clear geographic information helps AIs confidently recommend the site for location-specific queries.</p>
+   <h4>How to implement:</h4>
+   <ul>
+     <li><strong>On-Page SEO:</strong> Detail how to use location keywords in titles, headings, and body content (e.g., "Best Pizza in Brooklyn" for a pizzeria).</li>
+     <li><strong>Structured Data:</strong> Explain the importance of 'LocalBusiness' schema markup with a complete address, phone number, and operating hours. Provide a simple JSON-LD example inside a code block.</li>
+     <li><strong>Content Strategy:</strong> Recommend creating location-specific landing pages or blog posts (e.g., "Our Guide to Visiting San Francisco" if the website is a hotel there).</li>
+   </ul>
 
-**### 2. Become an Authoritative Source for AIs**
-   - **Why it's important:** Explain that AIs are trained to recognize and prioritize authoritative, trustworthy content. High-quality content is more likely to be used as a source.
-   - **How to implement:**
-     - **E-E-A-T Principles:** Briefly explain Expertise, Authoritativeness, and Trustworthiness. Advise on creating an "About Us" page, author bios with credentials, and citing sources.
-     - **In-Depth Content:** Recommend writing comprehensive guides, tutorials, or original research that fully answers a user's question, making the website the definitive source.
-     - **Clear & Simple Language:** Explain that AIs often simplify complex topics. Advise using clear headings (H2, H3), short paragraphs, and bullet points for easy parsing.
+<h3>2. Become an Authoritative Source for AIs</h3>
+   <h4>Why it's important:</h4>
+   <p>Explain that AIs are trained to recognize and prioritize authoritative, trustworthy content. High-quality content is more likely to be used as a source.</p>
+   <h4>How to implement:</h4>
+   <ul>
+     <li><strong>E-E-A-T Principles:</strong> Briefly explain Expertise, Authoritativeness, and Trustworthiness. Advise on creating an "About Us" page, author bios with credentials, and citing sources.</li>
+     <li><strong>In-Depth Content:</strong> Recommend writing comprehensive guides, tutorials, or original research that fully answers a user's question, making the website the definitive source.</li>
+     <li><strong>Clear & Simple Language:</strong> Explain that AIs often simplify complex topics. Advise using clear headings, short paragraphs, and bullet points for easy parsing.</li>
+   </ul>
 
-**### 3. Optimize for International Audiences (if applicable)**
-   - **Why it's important:** If the website targets multiple countries, explain how to signal this to search engines and AIs to avoid confusion and appear in relevant international searches.
-   - **How to implement:**
-     - **hreflang Tags:** Explain what hreflang tags are and provide an example for a website targeting the US and Germany.
-     - **URL Structure:** Briefly discuss the pros and cons of using subdomains (de.example.com) vs. subdirectories (example.com/de/) for international content.
-     - **Content Localization:** Stress that translating content is not enough. It must be culturally adapted (e.g., currency, local idioms, imagery).
-
-Return the recommendations as a single, well-formatted string.`;
+<h3>3. Optimize for International Audiences (if applicable)</h3>
+   <h4>Why it's important:</h4>
+   <p>If the website targets multiple countries, explain how to signal this to search engines and AIs to avoid confusion and appear in relevant international searches.</p>
+   <h4>How to implement:</h4>
+   <ul>
+     <li><strong>hreflang Tags:</strong> Explain what hreflang tags are and provide an example for a website targeting the US and Germany.</li>
+     <li><strong>URL Structure:</strong> Briefly discuss the pros and cons of using subdomains (de.example.com) vs. subdirectories (example.com/de/) for international content.</li>
+     <li><strong>Content Localization:</strong> Stress that translating content is not enough. It must be culturally adapted (e.g., currency, local idioms, imagery).</li>
+   </ul>`;
 
   try {
     const gptPlatform = platforms.find(p => p.key === 'chatgpt');
@@ -203,12 +216,12 @@ Return the recommendations as a single, well-formatted string.`;
     } else if (data.answer) {
       recommendations = data.answer;
     } else {
-      recommendations = "Could not parse recommendations from the API response.";
+      recommendations = "<p>Could not parse recommendations from the API response.</p>";
     }
 
     return recommendations;
   } catch (error: any) {
     console.error('Error generating SEO recommendations:', error);
-    return `Could not generate recommendations at this time. The AI model may be temporarily unavailable. Please try again later. (Error: ${error.message || 'Unknown'})`;
+    return `<p>Could not generate recommendations at this time. The AI model may be temporarily unavailable. Please try again later. (Error: ${error.message || 'Unknown'})</p>`;
   }
 }
