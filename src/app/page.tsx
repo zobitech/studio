@@ -375,7 +375,7 @@ export default function AISightPage() {
                       <p>Analyzing your website and generating recommendations...</p>
                     </div>
                   ) : (
-                    <div className="prose prose-invert max-w-none text-slate-300 prose-headings:text-white prose-h3:text-primary prose-h4:text-slate-100 prose-strong:text-white" dangerouslySetInnerHTML={{ __html: recommendations }} />
+                    <div className="prose prose-invert max-w-none text-slate-300 prose-headings:text-white prose-h3:text-primary prose-h4:text-slate-100 prose-strong:text-white prose-a:text-primary hover:prose-a:text-primary/80" dangerouslySetInnerHTML={{ __html: recommendations }} />
                   )}
                 </CardContent>
               </Card>
