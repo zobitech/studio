@@ -77,4 +77,4 @@ The application will now be running on [http://localhost:9002](http://localhost:
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you have ideas for new features, bug fixes, or improvements, please feel free to open an issue or submit a pull request.
+Contributions are welcome! If you have ideas for new features, bug fixes, or improvements, please feel free to open an issue or submit a pull request. Special thanks to [@rahimahkhan](https://github.com/rahimahkhan) for their contributions.
