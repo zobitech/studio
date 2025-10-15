@@ -64,7 +64,9 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
            responseText = JSON.stringify(data);
         }
       } else if (platform.key === 'copilot') {
-         if (typeof data.copilot === 'string') {
+         if (data.BK9 && typeof data.BK9 === 'object' && data.BK9.answer) {
+          responseText = data.BK9.answer;
+        } else if (typeof data.copilot === 'string') {
           responseText = data.copilot;
         } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
           responseText = data.copilot.answer;
@@ -234,7 +236,9 @@ Provide a detailed set of recommendations structured with the following headings
           recommendations = data.answer;
         }
       } else if (platform.key === 'copilot') {
-        if (typeof data.copilot === 'string') {
+        if (data.BK9 && typeof data.BK9 === 'object' && data.BK9.answer) {
+          recommendations = data.BK9.answer;
+        } else if (typeof data.copilot === 'string') {
           recommendations = data.copilot;
         } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
           recommendations = data.copilot.answer;
