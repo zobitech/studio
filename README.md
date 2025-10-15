@@ -1,6 +1,5 @@
 # AISight: AI Visibility Monitoring Tool
-
-![AISight](https://i.postimg.cc/GmnfvbSK/Gemini-Generated-Image-ocgy4qocgy4qocgy.png)
+<img src="https://i.postimg.cc/GmnfvbSK/Gemini-Generated-Image-ocgy4qocgy4qocgy.png" alt="AISight" width="100" height="100">
 
 ## Is Your Website Invisible to AI?
 
