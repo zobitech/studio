@@ -1,6 +1,6 @@
 # AISight: AI Visibility Monitoring Tool
 
-![AISight](https://storage.googleapis.com/aistudio-hosting.appspot.com/gallery/items/hEACApZ81i/screenshots/1.png)
+![AISight](https://i.postimg.cc/GmnfvbSK/Gemini-Generated-Image-ocgy4qocgy4qocgy.png)
 
 ## Is Your Website Invisible to AI?
 
