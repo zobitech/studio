@@ -4,7 +4,7 @@ import { analyzePlatformResponse } from '@/ai/flows/analyze-platform-responses';
 
 const platforms = [
   { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://api.bk9.dev/ai/BK9?BK9=zobi&q={query}&model=gpt_o4_mini' },
-  { name: 'Copilot', key: 'copilot', isPost: false, apiUrl: 'https://api.bk9.dev/ai/copilot?q=' },
+  { name: 'Copilot', key: 'copilot', isPost: false, apiUrl: 'https://api.bk9.dev/ai/ai-search-3?q=' },
   { name: 'Perplexity', key: 'perplexity', isPost: false, apiUrl: 'https://api.bk9.dev/ai/Perplexity?q=' },
 ];
 
