@@ -40,4 +40,3 @@ This project is built with a modern, robust, and scalable tech stack:
 - **Visualizations:** [Recharts](https://recharts.org/) for creating beautiful and responsive charts.
 - **Server Actions:** For seamless client-server communication without needing to build a separate API.
 
-aBhatti) for their contributions.
