@@ -24,6 +24,12 @@ This tool allows you to run real-time tests to see if your website is cited as a
 3.  **Run the Test:** Click "Test My Website Visibility" to initiate the scan.
 4.  **Analyze & Act:** Review your visibility score, see which platforms cited your site, and dive into the expert recommendations to start improving your AI SEO.
 
+## 💻 Live Preview
+
+[![Deploy with Vercel](https://vercel.com/button)](https://aisight.vercel.app/)
+
+Click the button above to see a live demo of the application.
+
 ## 🛠️ Tech Stack
 
 This project is built with a modern, robust, and scalable tech stack:
