@@ -3,7 +3,7 @@
 import { analyzePlatformResponse } from '@/ai/flows/analyze-platform-responses';
 
 const platforms = [
-  { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://princeapi.zone.id/api/ai/openai?apikey=prince&q=' },
+  { name: 'GPT-4o mini', key: 'chatgpt', isPost: false, apiUrl: 'https://api.bk9.dev/ai/BK9?BK9=zobi&q={query}&model=gpt_o4_mini' },
   { name: 'Copilot', key: 'copilot', isPost: false, apiUrl: 'https://api.bk9.dev/ai/copilot?q=' },
   { name: 'Perplexity', key: 'perplexity', isPost: false, apiUrl: 'https://api.bk9.dev/ai/Perplexity?q=' },
 ];
@@ -18,7 +18,12 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
       finalPrompt += ' Please include web links and sources in your response.';
     }
     
-    const apiUrl = platform.apiUrl + encodeURIComponent(finalPrompt);
+    let apiUrl = platform.apiUrl;
+    if (apiUrl.includes('{query}')) {
+      apiUrl = apiUrl.replace('{query}', encodeURIComponent(finalPrompt));
+    } else {
+      apiUrl = apiUrl + encodeURIComponent(finalPrompt);
+    }
     
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -55,6 +60,8 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
           responseText = data.BK9;
         } else if (data.answer) {
           responseText = data.answer;
+        } else {
+           responseText = JSON.stringify(data);
         }
       } else if (platform.key === 'copilot') {
          if (typeof data.copilot === 'string') {
@@ -82,6 +89,8 @@ async function testAPI(platform: (typeof platforms)[0], prompt: string, website:
           responseText = data.perplexity.answer;
         } else if (data.answer) {
           responseText = data.answer;
+        } else {
+          responseText = JSON.stringify(data);
         }
       }
       else if (data.answer) {
@@ -152,7 +161,7 @@ export async function runVisibilityTests(website: string, prompt: string): Promi
 
 export async function getSeoRecommendations(website: string): Promise<string> {
   if (!website) {
-    return "Could not generate recommendations because the website URL is missing.";
+    return "<p>Could not generate recommendations because the website URL is missing.</p>";
   }
   
   const recommendationPrompt = `You are an expert AI Visibility and SEO Consultant. Your primary goal is to provide detailed, actionable strategies for a website to improve its chances of being cited and recommended by large language models (LLMs) like GPT, Copilot, and Perplexity, with a special focus on geographic (GEO) and international targeting.
@@ -195,37 +204,66 @@ Provide a detailed set of recommendations structured with the following headings
      <li><strong>Content Localization:</strong> Stress that translating content is not enough. It must be culturally adapted (e.g., currency, local idioms, imagery).</li>
    </ul>`;
 
-  try {
-    const gptPlatform = platforms.find(p => p.key === 'chatgpt');
-    if (!gptPlatform) {
-      throw new Error("GPT-4o mini platform not found.");
+  for (const platform of platforms) {
+    try {
+      let apiUrl = platform.apiUrl;
+      if (apiUrl.includes('{query}')) {
+        apiUrl = apiUrl.replace('{query}', encodeURIComponent(recommendationPrompt));
+      } else {
+        apiUrl = apiUrl + encodeURIComponent(recommendationPrompt);
+      }
+
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        console.error(`Attempt with ${platform.name} failed: HTTP ${response.status}`);
+        continue; // Try next platform
+      }
+
+      const data = await response.json();
+      let recommendations = '';
+
+      if (platform.key === 'chatgpt') {
+         if (data.result) {
+          recommendations = data.result;
+        } else if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
+          recommendations = data.BK9.answer;
+        } else if (typeof data.BK9 === 'string') {
+          recommendations = data.BK9;
+        } else if (data.answer) {
+          recommendations = data.answer;
+        }
+      } else if (platform.key === 'copilot') {
+        if (typeof data.copilot === 'string') {
+          recommendations = data.copilot;
+        } else if (typeof data.copilot === 'object' && data.copilot !== null && 'answer' in data.copilot) {
+          recommendations = data.copilot.answer;
+        } else if(data.answer) {
+           recommendations = data.answer;
+        }
+      } else if (platform.key === 'perplexity') {
+         if (data.BK9 && typeof data.BK9 === 'object' && data.BK9.answer) {
+          recommendations = data.BK9.answer;
+        } else if (typeof data.perplexity === 'string') {
+          recommendations = data.perplexity;
+        } else if (typeof data.perplexity === 'object' && data.perplexity !== null && 'answer' in data.perplexity) {
+          recommendations = data.perplexity.answer;
+        } else if (data.answer) {
+          recommendations = data.answer;
+        }
+      }
+
+      if (recommendations && recommendations.includes('<h3>')) {
+        return recommendations; // Found valid recommendations, return them.
+      }
+      
+      console.error(`Attempt with ${platform.name} failed: No valid recommendation content.`);
+
+    } catch (error: any) {
+      console.error(`Error generating SEO recommendations with ${platform.name}:`, error.message);
+      continue; // Try next platform
     }
-    
-    const apiUrl = gptPlatform.apiUrl + encodeURIComponent(recommendationPrompt);
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    let recommendations = '';
-
-    if (data.result) {
-      recommendations = data.result;
-    } else if (typeof data.BK9 === 'object' && data.BK9 !== null && 'answer' in data.BK9) {
-      recommendations = data.BK9.answer;
-    } else if (typeof data.BK9 === 'string') {
-      recommendations = data.BK9;
-    } else if (data.answer) {
-      recommendations = data.answer;
-    } else {
-      recommendations = "<p>Could not parse recommendations from the API response.</p>";
-    }
-
-    return recommendations;
-  } catch (error: any) {
-    console.error('Error generating SEO recommendations:', error);
-    return `<p>Could not generate recommendations at this time. The AI model may be temporarily unavailable. Please try again later. (Error: ${error.message || 'Unknown'})</p>`;
   }
+
+  return `<p>Could not generate recommendations at this time. All AI models failed to respond. Please try again later.</p>`;
 }
